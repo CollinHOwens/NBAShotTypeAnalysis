@@ -16,15 +16,14 @@ library(ggrepel)
 
 ## Data Read in and Manipulation.
 
-Many thanks to <https://github.com/DomSamangy> for uploading the past 20 seasons of NBA Chart data. This would not be possible without him due to my loops not working. On his github there are many resources for sports analytics, so make sure to check all of the links.
+First, I want to thank <https://github.com/DomSamangy> for uploading the past 20 seasons of NBA Chart data. This would not be possible without him due to my loops not working. On his github there are many resources for sports analytics, so make sure to check all of the links.
 
-I also wish to thank the HoopR Package in R for access to the NBA API and other basketball data functions as well.
+I also want to thank the HoopR Package in R for access to the NBA API and other basketball data functions as well.
 
 ```{r}
 FullShotData <- read.csv("D:/GradSchool/Personal Projects/Basketball/NBA/Writeups/ShotTypeWriteup/ShotsBySeason/NBA_2004_2024_Shots.csv")
 
 #Relevel and transform data for later
-
 FullShotData <- FullShotData %>% mutate(ZONE_RANGE = factor(ZONE_RANGE, levels = c("Less Than 8 ft.","8-16 ft.","16-24 ft.","24+ ft.","Back Court Shot")))
 FullShotData <- FullShotData %>% mutate(BASIC_ZONE = factor(BASIC_ZONE, levels = c("Restricted Area","In The Paint (Non-RA)","Mid-Range","Above the Break 3","Right Corner 3","Left Corner 3","Backcourt")))
 
@@ -169,10 +168,10 @@ Next graph will be the last for positions looks at the specifics of Restricted A
 PositionalShotZoneSummary <- FullShotData %>% na.omit() %>%
   group_by(SEASON_1, SimplifiedZone2,POSITION_GROUP) %>%                  
   summarise(TotalShots = n(), .groups = 'drop') %>%  
-  group_by(SEASON_1, POSITION_GROUP) %>%  # Group by season and position group
+  group_by(SEASON_1, POSITION_GROUP) %>%
   mutate(
-    PositionTotalAttempts = sum(TotalShots),  # Total attempts for each position group in a season
-    ShotTypePercentage = (TotalShots / PositionTotalAttempts) * 100  # Percentage of shots within the position group
+    PositionTotalAttempts = sum(TotalShots),  
+    ShotTypePercentage = (TotalShots / PositionTotalAttempts) * 100  
   ) %>%
   ungroup()
 
@@ -199,10 +198,9 @@ PlayerShotRangeProfile <- function(Player)
   ) %>%
   ungroup()
   
-  FirstSeason <- min(PlayerShotData$SEASON_1)
+FirstSeason <- min(PlayerShotData$SEASON_1)
 LastSeason <- max(PlayerShotData$SEASON_1)
 
-# Filter for first and last seasons to add labels
 LabelData <- PlayerShotData %>%
   filter(SEASON_1 %in% c(FirstSeason, LastSeason))
 
@@ -213,8 +211,8 @@ ggplot(data = PlayerShotData, aes(x = SEASON_1, y = ShotTypePercentage, color = 
       color = "black",
       nudge_x = .3,
       nudge_y = 2,
-      segment.color = "grey50",  # Draw lines connecting labels to points
-      max.overlaps = Inf         # Allow all labels to be displayed
+      segment.color = "grey50",  
+      max.overlaps = Inf         
     )
 }
 
@@ -241,13 +239,13 @@ LabelData <- PlayerShotData %>%
 
 ggplot(data = PlayerShotData, aes(x = SEASON_1, y = ShotTypePercentage, color = SimplifiedZone)) + geom_line() + geom_point() + scale_color_manual(values = c("red","blue","darkgreen","black","gray")) + labs(x = "Season", y = "Percentage of Shot Taken", title = paste("Percentage of Shot Zone by Season for", Player), color = "Shot Zone") + scale_x_continuous(breaks = unique(PlayerShotData$SEASON_1)) + geom_text_repel(
       data = LabelData,
-      aes(label = round(ShotTypePercentage, 1)),  # Add percentages as labels
+      aes(label = round(ShotTypePercentage, 1)),  
       size = 4,
       color = "black",
-      nudge_x = .3,  # Additional manual nudging (optional)
+      nudge_x = .3,  
       nudge_y = 2,
-      segment.color = "grey50",  # Draw lines connecting labels to points
-      max.overlaps = Inf         # Allow all labels to be displayed
+      segment.color = "grey50",  
+      max.overlaps = Inf         
     )
 }
 
@@ -332,8 +330,8 @@ I chose DeAndre Jordan, Rudy Gobert, and Tyson Chandler for these as they are no
     ungroup() %>%
     group_by(PLAYER_NAME) %>%
     summarise(
-      Variance = var(ShotTypePercentage, na.rm = TRUE),  # Compute variance
-      AvgShots = mean(ShotTypePercentage, na.rm = TRUE), # Average shot type % (optional)
+      Variance = var(ShotTypePercentage, na.rm = TRUE),  
+      AvgShots = mean(ShotTypePercentage, na.rm = TRUE), 
       .groups = "drop"
     )
   
